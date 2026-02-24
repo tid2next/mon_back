@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import dj_database_url
 
 # ------------------------------------------------------------
 # BASE DIRECTORY
@@ -9,13 +10,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------
 # SECURITY
 # ------------------------------------------------------------
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-key-for-school-doc-proj')
-DEBUG = False  # ⚠️ Toujours False en prod !
-ALLOWED_HOSTS = ['*']# ----------------------------------------------------------
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-dev-key"
+)
+
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = [
+    "mon-back-w4sx.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
+# ------------------------------------------------------------
 # INSTALLED APPS
 # ------------------------------------------------------------
 INSTALLED_APPS = [
-    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -23,12 +34,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third-party apps
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
 
-    # Local apps
     'library',
 ]
 
@@ -36,8 +45,9 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # ------------------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # doit être en haut
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # 👈 static Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,17 +82,12 @@ TEMPLATES = [
 ]
 
 # ------------------------------------------------------------
-# DATABASE (PostgreSQL Render)
+# DATABASE (Render auto)
 # ------------------------------------------------------------
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['DB_NAME'],         # Render PostgreSQL DB name
-        'USER': os.environ['DB_USER'],         # Render DB user
-        'PASSWORD': os.environ['DB_PASSWORD'], # Render DB password
-        'HOST': os.environ['DB_HOST'],         # Render DB host
-        'PORT': os.environ['DB_PORT'],         # Render DB port
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
+    )
 }
 
 # ------------------------------------------------------------
@@ -107,10 +112,12 @@ USE_TZ = True
 # STATIC FILES
 # ------------------------------------------------------------
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"  # Render collectstatic ici
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ------------------------------------------------------------
-# REST FRAMEWORK SETTINGS
+# REST FRAMEWORK
 # ------------------------------------------------------------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -119,14 +126,14 @@ REST_FRAMEWORK = {
 }
 
 # ------------------------------------------------------------
-# CORS SETTINGS
+# CORS
 # ------------------------------------------------------------
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    'https://mon-back-w4sx.onrender.com',
+    "https://mon-back-w4sx.onrender.com",
 ]
 
 # ------------------------------------------------------------
-# DEFAULT PRIMARY KEY FIELD
+# DEFAULT PK
 # ------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
