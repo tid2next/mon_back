@@ -11,8 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-key-for-school-doc-proj')
 DEBUG = False  # ⚠️ Toujours False en prod !
-ALLOWED_HOSTS = ['mon-back-w4sx.onrender.com', 'www.mon-back-w4sx.onrender.com']
-
+ALLOWED_HOSTS = [*]
 # ------------------------------------------------------------
 # INSTALLED APPS
 # ------------------------------------------------------------
@@ -35,19 +34,10 @@ INSTALLED_APPS = [
 ]
 
 # ------------------------------------------------------------
-# REST FRAMEWORK SETTINGS
-# ------------------------------------------------------------
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
-}
-
-# ------------------------------------------------------------
 # MIDDLEWARE
 # ------------------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # must be high up
+    'corsheaders.middleware.CorsMiddleware',  # doit être en haut
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -83,17 +73,16 @@ TEMPLATES = [
 ]
 
 # ------------------------------------------------------------
-# DATABASE
+# DATABASE (PostgreSQL Render)
 # ------------------------------------------------------------
-# Utiliser PostgreSQL en prod sur Render
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'postgres'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'NAME': os.environ['DB_NAME'],         # Render PostgreSQL DB name
+        'USER': os.environ['DB_USER'],         # Render DB user
+        'PASSWORD': os.environ['DB_PASSWORD'], # Render DB password
+        'HOST': os.environ['DB_HOST'],         # Render DB host
+        'PORT': os.environ['DB_PORT'],         # Render DB port
     }
 }
 
@@ -119,17 +108,26 @@ USE_TZ = True
 # STATIC FILES
 # ------------------------------------------------------------
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"  # Render collectstatic place ici
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Render collectstatic ici
+
+# ------------------------------------------------------------
+# REST FRAMEWORK SETTINGS
+# ------------------------------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
+# ------------------------------------------------------------
+# CORS SETTINGS
+# ------------------------------------------------------------
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://mon-back-w4sx.onrender.com',
+]
 
 # ------------------------------------------------------------
 # DEFAULT PRIMARY KEY FIELD
 # ------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# ------------------------------------------------------------
-# CORS SETTINGS (DEV ONLY)
-# ------------------------------------------------------------
-CORS_ALLOW_ALL_ORIGINS = False  # En prod, limiter aux domaines autorisés
-CORS_ALLOWED_ORIGINS = [
-    'https://mon-back-w4sx.onrender.com',
-]
